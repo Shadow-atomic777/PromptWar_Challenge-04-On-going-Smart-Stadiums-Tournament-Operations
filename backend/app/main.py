@@ -1,7 +1,10 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 import asyncio
+import os
 
 from app.core.config import get_settings
 from app.core.database import init_db
@@ -9,6 +12,7 @@ from app.api.simulation_routes import router as sim_router
 from app.api.chat_routes import router as chat_router
 from app.api.ops_routes import router as ops_router
 from app.api.ws_routes import router as ws_router
+from app.api.auth_routes import router as auth_router
 from app.services.simulation import SimulationEngine
 
 settings = get_settings()
@@ -64,6 +68,7 @@ app.add_middleware(
 app.include_router(sim_router, prefix="/api/sim", tags=["Simulation"])
 app.include_router(chat_router, prefix="/api/chat", tags=["Chat"])
 app.include_router(ops_router, prefix="/api/ops", tags=["Operations"])
+app.include_router(auth_router, prefix="/api/auth", tags=["Auth"])
 app.include_router(ws_router, tags=["WebSocket"])
 
 
@@ -83,3 +88,21 @@ async def health_check():
         "status": "healthy",
         "simulation_active": simulation_engine is not None and simulation_engine.running,
     }
+
+# Serve React Frontend (Single Page Application)
+frontend_dist = os.path.join(os.path.dirname(__file__), "../../frontend/dist")
+if os.path.exists(frontend_dist):
+    app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dist, "assets")), name="assets")
+    
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        # Prevent API routes from being intercepted by the frontend catch-all
+        if full_path.startswith("api/"):
+            return {"error": "Not Found"}
+            
+        file_path = os.path.join(frontend_dist, full_path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+        
+        # Fallback to index.html for React Router
+        return FileResponse(os.path.join(frontend_dist, "index.html"))

@@ -1,9 +1,12 @@
-import { Link } from 'react-router-dom';
-import { Activity, Users, Clock, AlertTriangle, CloudRain, ArrowLeft } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Activity, Users, Clock, AlertTriangle, CloudRain, ArrowLeft, LogOut } from 'lucide-react';
 import { useOpsWebSocket } from '../hooks/useOpsWebSocket';
+import { useAuth } from '../context/AuthContext';
 
 export default function OpsDashboard() {
   const { data, status } = useOpsWebSocket();
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
 
   const handleSimulateEmergency = async () => {
     try {
@@ -15,14 +18,19 @@ export default function OpsDashboard() {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   return (
     <div style={{ padding: '2rem', maxWidth: '1600px', margin: '0 auto' }}>
       {/* Header */}
       <header className="flex-between" style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <Link to="/" className="btn btn-secondary" style={{ padding: '0.5rem' }}>
-            <ArrowLeft size={20} />
-          </Link>
+          <button onClick={handleLogout} className="btn btn-secondary" style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.1)', color: 'white' }}>
+            <LogOut size={20} />
+          </button>
           <h1 className="text-gradient" style={{ fontSize: '2rem', margin: 0 }}>OmniStadium Command Center</h1>
         </div>
         

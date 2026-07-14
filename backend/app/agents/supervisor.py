@@ -54,15 +54,32 @@ Real-time Stadium State:
         
         start_time = time.time()
         
-        response = self.client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-                response_schema=GeminiChatResponse,
-                temperature=0.4,
-            ),
-        )
+        models_to_try = [
+            'gemini-flash-lite-latest',
+            'gemini-flash-latest',
+            'gemini-pro-latest'
+        ]
+        
+        last_error = None
+        for model_name in models_to_try:
+            try:
+                response = self.client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        response_schema=GeminiChatResponse,
+                        temperature=0.4,
+                    ),
+                )
+                # Break out of loop if successful
+                break
+            except Exception as e:
+                print(f"[Gemini API fallback] {model_name} failed: {e}")
+                last_error = e
+        else:
+            # If the loop finishes without breaking, all models failed
+            raise last_error
         
         total_duration = (time.time() - start_time) * 1000
         
