@@ -11,10 +11,19 @@ from app.main import app
 from app.core.database import init_db
 
 @pytest_asyncio.fixture(autouse=True)
-async def setup_db():
-    """Ensure database tables exist before running tests."""
+async def setup_test_env():
+    """Ensure database tables exist and mock the simulation engine before running tests."""
+    import app.main as main
+    from app.services.simulation import SimulationEngine
+    
     await init_db()
+    
+    # Manually instantiate so endpoints don't return 503 Service Unavailable
+    main.simulation_engine = SimulationEngine()
+    
     yield
+    
+    main.simulation_engine = None
 
 @pytest_asyncio.fixture
 async def async_client():
