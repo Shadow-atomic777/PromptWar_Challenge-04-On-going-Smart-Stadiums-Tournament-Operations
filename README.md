@@ -8,6 +8,11 @@
 
 ---
 
+## 🌐 Live Demo
+**Try the live app here:** [https://on-going-smart-stadiums-tournament-operations.ai.studio](https://on-going-smart-stadiums-tournament-operations.ai.studio)
+
+---
+
 ## 🎯 What is OmniStadium?
 
 OmniStadium is **NOT a chatbot**. It is a production-inspired, AI-powered **Stadium Operations Center** that uses a team of specialized AI agents to manage the FIFA World Cup 2026 experience for 80,000+ fans in real-time.

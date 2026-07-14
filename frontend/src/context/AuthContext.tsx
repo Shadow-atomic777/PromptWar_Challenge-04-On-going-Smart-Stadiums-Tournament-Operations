@@ -23,7 +23,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (userType: 'staff' | 'fan', idValue: string, pass: string) => {
     try {
-      const url = `http://localhost:8000/api/auth/${userType}/login`;
+      const baseUrl = import.meta.env.PROD ? '' : 'http://localhost:8000';
+      const url = `${baseUrl}/api/auth/${userType}/login`;
       const body = userType === 'staff' ? { staff_id: idValue, password: pass } : { ticket_id: idValue, password: pass };
       
       const res = await fetch(url, {
@@ -47,7 +48,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signup = async (userType: 'staff' | 'fan', idValue: string, pass: string, name: string) => {
     try {
-      const url = `http://localhost:8000/api/auth/${userType}/signup`;
+      const baseUrl = import.meta.env.PROD ? '' : 'http://localhost:8000';
+      const url = `${baseUrl}/api/auth/${userType}/signup`;
       const body = userType === 'staff' ? { staff_id: idValue, password: pass, name } : { ticket_id: idValue, password: pass, name };
       
       const res = await fetch(url, {

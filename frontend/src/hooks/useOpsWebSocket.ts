@@ -9,7 +9,10 @@ export function useOpsWebSocket() {
     let reconnectTimer: number;
 
     const connect = () => {
-      ws = new WebSocket('ws://localhost:8000/ws/ops');
+      const wsUrl = import.meta.env.PROD 
+        ? `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws/ops` 
+        : 'ws://localhost:8000/ws/ops';
+      ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
         setStatus('connected');
