@@ -10,8 +10,12 @@ export default function OpsDashboard() {
 
   const handleSimulateEmergency = async () => {
     try {
-      await fetch('http://localhost:8000/api/ops/emergency/simulate?sector=north_lower', {
-        method: 'POST'
+      const baseUrl = import.meta.env.PROD ? '' : 'http://localhost:8000';
+      await fetch(`${baseUrl}/api/ops/emergency/simulate?sector=north_lower`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${user?.token}`
+        }
       });
     } catch (e) {
       console.error(e);
@@ -28,14 +32,14 @@ export default function OpsDashboard() {
       {/* Header */}
       <header className="flex-between" style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <button onClick={handleLogout} className="btn btn-secondary" style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.1)', color: 'white' }}>
-            <LogOut size={20} />
+          <button onClick={handleLogout} className="btn btn-secondary" aria-label="Log out of Command Center" style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.1)', color: 'white' }}>
+            <LogOut size={20} aria-hidden="true" />
           </button>
           <h1 className="text-gradient" style={{ fontSize: '2rem', margin: 0 }}>OmniStadium Command Center</h1>
         </div>
         
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <div className="badge" style={{ 
+          <div className="badge" aria-live="polite" style={{ 
             background: status === 'connected' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
             color: status === 'connected' ? 'var(--success)' : 'var(--danger)',
             display: 'flex', alignItems: 'center', gap: '0.5rem'
@@ -43,15 +47,17 @@ export default function OpsDashboard() {
             <div style={{ 
               width: '8px', height: '8px', borderRadius: '50%', 
               background: status === 'connected' ? 'var(--success)' : 'var(--danger)' 
-            }} className={status === 'connected' ? 'animate-pulse-glow' : ''} />
-            {status.toUpperCase()}
+            }} className={status === 'connected' ? 'animate-pulse-glow' : ''} aria-hidden="true" />
+            <span className="sr-only">Connection Status:</span> {status.toUpperCase()}
           </div>
           
-          <button className="btn btn-primary" style={{ background: 'var(--danger)' }} onClick={handleSimulateEmergency}>
-            <AlertTriangle size={18} /> Simulate Emergency
+          <button className="btn btn-primary" aria-label="Simulate an emergency incident" style={{ background: 'var(--danger)' }} onClick={handleSimulateEmergency}>
+            <AlertTriangle size={18} aria-hidden="true" /> Simulate Emergency
           </button>
         </div>
       </header>
+      
+      <main>
 
       {!data ? (
         <div className="flex-center glass-panel" style={{ height: '60vh', flexDirection: 'column', gap: '1rem' }}>
@@ -208,6 +214,7 @@ export default function OpsDashboard() {
           </div>
         </div>
       )}
+      </main>
     </div>
   );
 }

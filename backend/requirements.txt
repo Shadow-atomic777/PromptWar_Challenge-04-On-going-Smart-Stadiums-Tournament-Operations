@@ -7,3 +7,7 @@ google-genai==1.14.0
 aiosqlite==0.21.0
 websockets==15.0.1
 httpx==0.28.1
+bcrypt==4.1.2
+PyJWT==2.8.0
+pytest==8.0.0
+pytest-asyncio==0.23.5

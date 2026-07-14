@@ -4,6 +4,7 @@ type User = {
   id: string;
   role: 'ops' | 'admin' | 'fan';
   name: string;
+  token?: string;
 } | null;
 
 interface AuthContextType {
@@ -36,7 +37,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (!res.ok) return false;
       const data = await res.json();
       
-      const newUser = { id: data.staff_id || data.ticket_id, role: data.role, name: data.name };
+      const newUser = { id: data.staff_id || data.ticket_id, role: data.role, name: data.name, token: data.token };
       setUser(newUser);
       localStorage.setItem('omnistadium_auth', JSON.stringify(newUser));
       return true;
@@ -61,7 +62,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (!res.ok) return false;
       const data = await res.json();
       
-      const newUser = { id: data.staff_id || data.ticket_id, role: data.role, name: data.name };
+      const newUser = { id: data.staff_id || data.ticket_id, role: data.role, name: data.name, token: data.token };
       setUser(newUser);
       localStorage.setItem('omnistadium_auth', JSON.stringify(newUser));
       return true;

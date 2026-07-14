@@ -5,9 +5,11 @@ DB_PATH = Path(__file__).parent.parent.parent / "omnistadium.db"
 
 
 async def get_db() -> aiosqlite.Connection:
-    """Get an async database connection."""
+    """Get an async database connection optimized with WAL mode."""
     db = await aiosqlite.connect(str(DB_PATH))
     db.row_factory = aiosqlite.Row
+    await db.execute("PRAGMA journal_mode=WAL;")
+    await db.execute("PRAGMA synchronous=NORMAL;")
     return db
 
 

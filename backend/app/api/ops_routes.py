@@ -1,11 +1,11 @@
 """Operations endpoints for stadium staff."""
 import uuid
 from datetime import datetime, timezone
-from fastapi import APIRouter, HTTPException
-
+from fastapi import APIRouter, HTTPException, Depends
+from app.core.security import get_current_ops_user
 from app.models.chat import IncidentRequest, IncidentResponse
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_ops_user)])
 
 
 @router.post("/incident", response_model=IncidentResponse)

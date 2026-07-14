@@ -9,34 +9,35 @@ export default function Landing() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <nav style={{ padding: '1.5rem 0', borderBottom: '1px solid var(--border)' }}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <AnimatedFootball size={36} />
-            <span style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.02em', marginLeft: '0.25rem' }}>
-              OMNI<span style={{ color: 'var(--primary)' }}>STADIUM</span>
-            </span>
-          </div>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            {match && (
-              <div className="animate-fade-in" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-                <div style={{ width: '6px', height: '6px', background: 'var(--success)', borderRadius: '50%' }} className="animate-pulse-glow" />
-                {match.phase.replace('_', ' ')} • {match.current_minute}'
-              </div>
-            )}
+      <header>
+        <nav style={{ padding: '1.5rem 0', borderBottom: '1px solid var(--border)' }} aria-label="Main Navigation">
+          <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             
-            <Link to="/login" className="btn" style={{ background: 'rgba(255,255,255,0.1)', color: 'white', padding: '0.5rem 1.25rem', borderRadius: '99px', fontSize: '0.875rem' }}>
-              Sign In
-            </Link>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }} aria-hidden="true">
+              <AnimatedFootball size={36} />
+              <span style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.02em', marginLeft: '0.25rem' }}>
+                OMNI<span style={{ color: 'var(--primary)' }}>STADIUM</span>
+              </span>
+            </div>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              {match && (
+                <div className="animate-fade-in" aria-live="polite" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                  <div style={{ width: '6px', height: '6px', background: 'var(--success)', borderRadius: '50%' }} className="animate-pulse-glow" aria-hidden="true" />
+                  <span className="sr-only">Live Match Phase:</span> {match.phase.replace('_', ' ')} • <span className="sr-only">Minute:</span> {match.current_minute}'
+                </div>
+              )}
+              
+              <Link to="/login" className="btn" aria-label="Sign In to OmniStadium" style={{ background: 'rgba(255,255,255,0.1)', color: 'white', padding: '0.5rem 1.25rem', borderRadius: '99px', fontSize: '0.875rem' }}>
+                Sign In
+              </Link>
+            </div>
+
           </div>
-
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <main className="container" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '4rem 2rem' }}>
+        </nav>
+      </header>
+      
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 0' }}>
         
         {/* Hero Section */}
         <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto 4rem auto', position: 'relative' }} className="animate-fade-in">
