@@ -1,6 +1,8 @@
 # 🏟️ OmniStadium — Multi-Agent AI Stadium Operations Center
 
-> **Google Developers Hackathon 2026 — Smart Stadiums & Tournament Operations**
+> **PromptWar: Vibe Coding Hackathon — Smart Stadiums & Tournament Operations**
+> Organized by **Hack2Skill** and **Google for Developers**
+> Built entirely using **Google Anti-Gravity** (Agentic AI)
 
 ![Status](https://img.shields.io/badge/Status-In%20Development-yellow)
 ![Google AI](https://img.shields.io/badge/Powered%20By-Google%20Gemini-blue)
@@ -158,7 +160,7 @@ GEMINI_API_KEY=your_gemini_api_key_here
 
 ## 👥 Team
 
-Built with ❤️ for the Google Developers Hackathon 2026.
+Built with ❤️ for PromptWar: Vibe Coding Hackathon by Hack2Skill and Google for Developers, using Google Anti-Gravity.
 
 ---
 
