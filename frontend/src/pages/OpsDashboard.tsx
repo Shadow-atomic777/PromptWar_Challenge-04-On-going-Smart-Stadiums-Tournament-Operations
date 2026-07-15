@@ -32,7 +32,7 @@ export default function OpsDashboard() {
       {/* Header */}
       <header className="flex-between" style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <button onClick={handleLogout} className="btn btn-secondary" aria-label="Log out of Command Center" style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.1)', color: 'white' }}>
+          <button onClick={handleLogout} className="btn btn-secondary" aria-label="Log out of Command Center" style={{ padding: '0.5rem', background: 'rgba(128,128,128,0.1)', color: 'var(--text-main)' }}>
             <LogOut size={20} aria-hidden="true" />
           </button>
           <h1 className="text-gradient" style={{ fontSize: '2rem', margin: 0 }}>OmniStadium Command Center</h1>

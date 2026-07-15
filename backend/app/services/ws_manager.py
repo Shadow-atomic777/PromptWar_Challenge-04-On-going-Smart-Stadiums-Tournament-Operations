@@ -3,6 +3,9 @@ from fastapi import WebSocket
 import json
 import asyncio
 from typing import Any
+import logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 class ConnectionManager:
@@ -20,27 +23,27 @@ class ConnectionManager:
         await websocket.accept()
         async with self._lock:
             self.ops_connections.append(websocket)
-        print(f"[WS] Ops client connected. Total: {len(self.ops_connections)}")
+        logger.info(f"[WS] Ops client connected. Total: {len(self.ops_connections)}")
 
     async def disconnect_ops(self, websocket: WebSocket):
         """Remove an ops dashboard connection."""
         async with self._lock:
             if websocket in self.ops_connections:
                 self.ops_connections.remove(websocket)
-        print(f"[WS] Ops client disconnected. Total: {len(self.ops_connections)}")
+        logger.info(f"[WS] Ops client disconnected. Total: {len(self.ops_connections)}")
 
     async def connect_fan(self, fan_id: str, websocket: WebSocket):
         """Accept a fan WebSocket connection."""
         await websocket.accept()
         async with self._lock:
             self.fan_connections[fan_id] = websocket
-        print(f"[WS] Fan {fan_id} connected. Total fans: {len(self.fan_connections)}")
+        logger.info(f"[WS] Fan {fan_id} connected. Total fans: {len(self.fan_connections)}")
 
     async def disconnect_fan(self, fan_id: str):
         """Remove a fan connection."""
         async with self._lock:
             self.fan_connections.pop(fan_id, None)
-        print(f"[WS] Fan {fan_id} disconnected. Total fans: {len(self.fan_connections)}")
+        logger.info(f"[WS] Fan {fan_id} disconnected. Total fans: {len(self.fan_connections)}")
 
     async def broadcast_ops(self, data: dict[str, Any]):
         """Broadcast data to all ops dashboard clients."""

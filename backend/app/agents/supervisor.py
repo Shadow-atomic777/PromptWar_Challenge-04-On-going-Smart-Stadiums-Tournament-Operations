@@ -5,6 +5,9 @@ import time
 
 from app.core.config import get_settings
 from app.models.chat import ChatResponse, AgentStep
+import logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 settings = get_settings()
 
@@ -45,7 +48,7 @@ Format the output as a friendly, helpful message with emojis.
 Do not expose the raw JSON data to the fan, synthesize it smoothly.
 Include logical 'reasoning_steps' that show how different specialized agents (like queue_optimizer, route_planner, weather_agent) would have analyzed the data.
 
-Fan Query: "{query}"
+Fan Query: <fan_input>{query[:300]}</fan_input>
 Fan Location: {fan_sector or 'Unknown'}
 
 Real-time Stadium State:
@@ -75,7 +78,7 @@ Real-time Stadium State:
                 # Break out of loop if successful
                 break
             except Exception as e:
-                print(f"[Gemini API fallback] {model_name} failed: {e}")
+                logger.error(f"[Gemini API fallback] {model_name} failed: {e}")
                 last_error = e
         else:
             # If the loop finishes without breaking, all models failed
@@ -108,7 +111,7 @@ Real-time Stadium State:
                 confidence=data.get("confidence", 0.9)
             )
         except Exception as e:
-            print(f"Error parsing Gemini response: {e}")
+            logger.error(f"Error parsing Gemini response: {e}")
             raise
 
     def _summarize_state(self, state: dict, fan_sector: str | None) -> str:

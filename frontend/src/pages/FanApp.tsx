@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Send, Sparkles, MapPin, Trophy, Navigation, Coffee, Activity } from 'lucide-react';
+import { ArrowLeft, Send, Sparkles, MapPin, Trophy, Navigation, Coffee, Activity, Globe } from 'lucide-react';
 import { useOpsWebSocket } from '../hooks/useOpsWebSocket';
+import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 
 interface Message {
   id: string;
@@ -13,10 +15,13 @@ interface Message {
 }
 
 export default function FanApp() {
+  const { language, setLanguage, t } = useLanguage();
+  const { user } = useAuth();
+  
   const [messages, setMessages] = useState<Message[]>([{
     id: 'msg-1',
     sender: 'ai',
-    text: "👋 Welcome to OmniStadium! I'm your AI matchday assistant. Ask me to find the shortest food queues, navigate to your seat, or check the weather!",
+    text: t('welcome'),
     timestamp: new Date().toISOString(),
     suggestions: ["Where is the nearest hotdog stand?", "Find me a restroom", "Match details"]
   }]);
@@ -51,8 +56,11 @@ export default function FanApp() {
     try {
       const res = await fetch('http://localhost:8000/api/chat/fan', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, fan_id: "fan-123", sector: "north_lower" })
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.token}`
+        },
+        body: JSON.stringify({ message: text, fan_id: user?.id || "unknown", sector: user?.sector || "unknown" })
       });
       const data = await res.json();
       
@@ -82,30 +90,53 @@ export default function FanApp() {
   const pitchPattern = "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h20v40H0V0zm20 0h20v40H20V0z' fill='%23ffffff' fill-opacity='0.02' fill-rule='evenodd'/%3E%3C/svg%3E\")";
 
   return (
-    <div style={{ maxWidth: '500px', margin: '0 auto', height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-dark)', boxShadow: '0 0 50px rgba(0,0,0,0.5)', position: 'relative' }}>
+    <div className="fan-app-container">
       
       {/* Dynamic Stadium Background for Chat */}
       <div style={{ position: 'absolute', inset: 0, backgroundImage: pitchPattern, backgroundSize: '40px 40px', opacity: 0.8, pointerEvents: 'none' }} />
 
       {/* Header - Styled like a Match Ticket / Scoreboard */}
-      <header className="glass-panel" style={{ padding: '1.25rem 1rem', borderBottom: '1px solid var(--border)', borderRadius: 0, position: 'relative', zIndex: 10, background: 'linear-gradient(180deg, rgba(3, 7, 18, 0.95) 0%, rgba(17, 24, 39, 0.8) 100%)' }}>
+      <header className="glass-panel chat-header-panel">
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.75rem' }}>
-          <Link to="/" style={{ color: 'var(--text-main)', padding: '0.5rem', background: 'rgba(255,255,255,0.1)', borderRadius: '50%' }}>
-            <ArrowLeft size={20} />
+          <Link to="/" aria-label="Return to landing page" style={{ color: 'var(--text-main)', padding: '0.5rem', background: 'rgba(255,255,255,0.1)', borderRadius: '50%' }}>
+            <ArrowLeft size={20} aria-hidden="true" />
           </Link>
           <div style={{ flex: 1 }}>
             <h2 style={{ fontSize: '1.25rem', margin: 0, fontFamily: 'Outfit', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              Fan Assistant <Sparkles size={16} color="var(--primary)" />
+              {t('assistant_title')} <Sparkles size={16} color="var(--primary)" />
             </h2>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '2px' }}>
-              <MapPin size={12} color="var(--success)" /> Seat: North Lower, Row B
+              <MapPin size={12} color="var(--success)" /> {t('seat')}
             </div>
+          </div>
+          
+          {/* Language Toggle Dropdown */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(0,0,0,0.5)', padding: '2px 8px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <Globe size={12} color="var(--text-muted)" />
+            <select 
+              value={language}
+              onChange={(e) => setLanguage(e.target.value as 'en' | 'es' | 'fr' | 'ar' | 'pt' | 'de' | 'ja')}
+              style={{
+                background: 'transparent',
+                color: 'var(--text-main)',
+                border: 'none', padding: '4px', outline: 'none',
+                fontSize: '0.75rem', fontWeight: 'bold', cursor: 'pointer', textTransform: 'uppercase'
+              }}
+            >
+              <option value="en">EN</option>
+              <option value="es">ES</option>
+              <option value="fr">FR</option>
+              <option value="ar">AR</option>
+              <option value="pt">PT</option>
+              <option value="de">DE</option>
+              <option value="ja">JA</option>
+            </select>
           </div>
         </div>
 
         {/* Live Score Strip inside Header */}
         {wsData?.stadium?.match && (
-          <div style={{ background: 'rgba(0,0,0,0.4)', borderRadius: '12px', padding: '0.5rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid rgba(255,255,255,0.05)' }}>
+          <div className="chat-live-score">
             <div style={{ fontSize: '0.75rem', color: 'var(--success)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '4px' }}>
               <div style={{ width: 6, height: 6, background: 'var(--success)', borderRadius: '50%' }} className="animate-pulse-glow" />
               {wsData.stadium.match.current_minute}'
@@ -122,7 +153,7 @@ export default function FanApp() {
       </header>
 
       {/* Chat Area */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem 1rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', position: 'relative', zIndex: 1 }}>
+      <main className="chat-main-area" aria-live="polite">
         {messages.map((msg) => (
           <div key={msg.id} className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: msg.sender === 'fan' ? 'flex-end' : 'flex-start' }}>
             
@@ -137,25 +168,14 @@ export default function FanApp() {
             )}
 
             {/* Bubble */}
-            <div style={{
-              background: msg.sender === 'fan' ? 'linear-gradient(135deg, var(--brand-primary), var(--brand-secondary))' : 'rgba(31, 41, 55, 0.85)',
-              color: 'var(--text-main)',
-              padding: '0.85rem 1.15rem',
-              borderRadius: msg.sender === 'fan' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-              maxWidth: '85%',
-              border: msg.sender === 'ai' ? '1px solid rgba(255,255,255,0.1)' : 'none',
-              boxShadow: msg.sender === 'fan' ? '0 4px 15px rgba(59, 130, 246, 0.3)' : '0 4px 15px rgba(0,0,0,0.2)',
-              lineHeight: 1.5,
-              fontSize: '0.95rem',
-              backdropFilter: 'blur(10px)'
-            }}>
+            <div className={msg.sender === 'fan' ? 'chat-bubble-fan' : 'chat-bubble-ai'}>
               <span dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>') }} />
             </div>
 
             {/* Agent Badges */}
             {msg.sender === 'ai' && msg.agents_used && (
               <div style={{ fontSize: '0.65rem', color: 'var(--success)', marginTop: '6px', marginLeft: '4px', display: 'flex', gap: '4px', alignItems: 'center', fontWeight: 600 }}>
-                <Activity size={10} /> ROUTED VIA: {msg.agents_used.join(', ')}
+                <Activity size={10} /> {t('routed_via')} {msg.agents_used.join(', ')}
               </div>
             )}
 
@@ -163,12 +183,7 @@ export default function FanApp() {
             {msg.suggestions && msg.suggestions.length > 0 && msg.id === messages[messages.length - 1].id && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '1rem' }}>
                 {msg.suggestions.map((sug, i) => (
-                  <button key={i} onClick={() => handleSend(sug)} style={{ 
-                    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', 
-                    color: 'var(--text-main)', cursor: 'pointer', padding: '0.6rem 1rem', 
-                    borderRadius: '20px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px',
-                    transition: 'all 0.2s',
-                  }} onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'} onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}>
+                  <button key={i} onClick={() => handleSend(sug)} className="chat-suggestion-btn">
                     {sug.toLowerCase().includes('food') || sug.toLowerCase().includes('hotdog') ? <Coffee size={12} /> : <Navigation size={12} />}
                     {sug}
                   </button>
@@ -186,35 +201,27 @@ export default function FanApp() {
           </div>
         )}
         <div ref={messagesEndRef} />
-      </div>
+      </main>
 
       {/* Input Area */}
-      <div style={{ padding: '1rem', borderTop: '1px solid var(--border)', background: 'rgba(3, 7, 18, 0.95)', position: 'relative', zIndex: 10 }}>
-        <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(255,255,255,0.05)', padding: '0.5rem', borderRadius: '99px', border: '1px solid rgba(255,255,255,0.1)' }}>
+      <div className="chat-input-area">
+        <div className="chat-input-wrapper">
           <input 
             type="text" 
+            aria-label={t('placeholder')}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend(input)}
-            placeholder="Ask your stadium assistant..."
-            style={{ 
-              flex: 1, background: 'transparent', border: 'none', 
-              padding: '0.5rem 1rem', color: 'white', outline: 'none', fontSize: '0.95rem'
-            }}
+            placeholder={t('placeholder')}
+            className="chat-input-field"
           />
           <button 
             onClick={() => handleSend(input)}
             disabled={!input.trim()}
-            style={{ 
-              width: '2.5rem', height: '2.5rem', borderRadius: '50%', 
-              background: input.trim() ? 'var(--primary)' : 'rgba(255,255,255,0.1)',
-              color: input.trim() ? 'white' : 'rgba(255,255,255,0.3)', border: 'none', 
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: input.trim() ? 'pointer' : 'not-allowed', transition: 'all 0.2s',
-              boxShadow: input.trim() ? '0 0 15px rgba(59, 130, 246, 0.4)' : 'none'
-            }}
+            aria-label="Send message"
+            className={`chat-send-btn ${input.trim() ? 'active' : 'disabled'}`}
           >
-            <Send size={16} style={{ transform: 'translateX(2px)' }} />
+            <Send size={16} aria-hidden="true" style={{ transform: 'translateX(2px)' }} />
           </button>
         </div>
       </div>

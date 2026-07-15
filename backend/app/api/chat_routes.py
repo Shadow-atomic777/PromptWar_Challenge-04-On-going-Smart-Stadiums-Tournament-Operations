@@ -1,8 +1,12 @@
 """Fan chat endpoint — routes queries through the AI agent system."""
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 
 from app.models.chat import ChatRequest, ChatResponse, AgentStep
 from app.agents.supervisor import SupervisorAgent
+from app.core.security import get_current_user
+import logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 router = APIRouter()
 
@@ -11,7 +15,7 @@ supervisor = SupervisorAgent()
 
 
 @router.post("/fan", response_model=ChatResponse)
-async def fan_chat(request: ChatRequest):
+async def fan_chat(request: ChatRequest, user: dict = Depends(get_current_user)):
     """
     Fan query → Multi-agent AI response.
     
@@ -36,7 +40,7 @@ async def fan_chat(request: ChatRequest):
                 current_state=current_state
             )
         except Exception as e:
-            print(f"[Gemini API failed]: {e}. Falling back to hardcoded responses.")
+            logger.error(f"[Gemini API failed]: {e}. Falling back to hardcoded responses.")
             # Fall through to hardcoded responses if it fails
             
     if not response:
@@ -167,6 +171,6 @@ async def fan_chat(request: ChatRequest):
         finally:
             await db.close()
     except Exception as e:
-        print(f"[DB Error] Failed to log chat: {e}")
+        logger.error(f"[DB Error] Failed to log chat: {e}")
         
     return response

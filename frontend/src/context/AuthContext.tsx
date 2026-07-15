@@ -5,6 +5,7 @@ type User = {
   role: 'ops' | 'admin' | 'fan';
   name: string;
   token?: string;
+  sector?: string;
 } | null;
 
 interface AuthContextType {
@@ -18,7 +19,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User>(() => {
-    const saved = localStorage.getItem('omnistadium_auth');
+    const saved = sessionStorage.getItem('omnistadium_auth');
     return saved ? JSON.parse(saved) : null;
   });
 
@@ -37,9 +38,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (!res.ok) return false;
       const data = await res.json();
       
-      const newUser = { id: data.staff_id || data.ticket_id, role: data.role, name: data.name, token: data.token };
+      const newUser = { 
+        id: data.staff_id || data.ticket_id, 
+        role: data.role, 
+        name: data.name, 
+        token: data.token,
+        sector: data.sector || 'south_upper' // Dynamically assign or mock sector on login
+      };
       setUser(newUser);
-      localStorage.setItem('omnistadium_auth', JSON.stringify(newUser));
+      sessionStorage.setItem('omnistadium_auth', JSON.stringify(newUser));
       return true;
     } catch (e) {
       console.error("Login Error:", e);
@@ -62,9 +69,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (!res.ok) return false;
       const data = await res.json();
       
-      const newUser = { id: data.staff_id || data.ticket_id, role: data.role, name: data.name, token: data.token };
+      const newUser = { 
+        id: data.staff_id || data.ticket_id, 
+        role: data.role, 
+        name: data.name, 
+        token: data.token,
+        sector: data.sector || 'south_upper'
+      };
       setUser(newUser);
-      localStorage.setItem('omnistadium_auth', JSON.stringify(newUser));
+      sessionStorage.setItem('omnistadium_auth', JSON.stringify(newUser));
       return true;
     } catch (e) {
       console.error("Signup Error:", e);
@@ -74,7 +87,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('omnistadium_auth');
+    sessionStorage.removeItem('omnistadium_auth');
   };
 
   return <AuthContext.Provider value={{ user, login, signup, logout }}>{children}</AuthContext.Provider>;

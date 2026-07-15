@@ -4,6 +4,9 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Depends
 from app.core.security import get_current_ops_user
 from app.models.chat import IncidentRequest, IncidentResponse
+import logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 router = APIRouter(dependencies=[Depends(get_current_ops_user)])
 
@@ -52,7 +55,7 @@ async def create_incident(request: IncidentRequest):
         finally:
             await db.close()
     except Exception as e:
-        print(f"[DB Error] Failed to log incident: {e}")
+        logger.error(f"[DB Error] Failed to log incident: {e}")
 
     return IncidentResponse(
         incident_id=incident_id,

@@ -7,8 +7,12 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import os
 
 # JWT Configuration
-# In production, this should be explicitly read from environment variables.
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", "b3901f4c7183eab5dc422d326f564be6f8510839eefcf3b7")
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+if not SECRET_KEY:
+    import secrets
+    import warnings
+    warnings.warn("JWT_SECRET_KEY not found in environment. Generating a temporary random key. Sessions will invalidate on restart.", RuntimeWarning)
+    SECRET_KEY = secrets.token_hex(32)
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 1 day expiration
 
@@ -17,8 +21,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     try:
         return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
     except ValueError:
-        # Fallback if the database still contains plaintext passwords during migration
-        return plain_password == hashed_password
+        return False
 
 def get_password_hash(password: str) -> str:
     """Generate a bcrypt hash for a plain text password."""

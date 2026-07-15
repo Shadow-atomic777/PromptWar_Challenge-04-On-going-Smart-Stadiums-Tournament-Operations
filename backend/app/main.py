@@ -15,6 +15,13 @@ from app.api.ws_routes import router as ws_router
 from app.api.auth_routes import router as auth_router
 from app.services.simulation import SimulationEngine
 
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from app.core.rate_limit import limiter
+import logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
 settings = get_settings()
 
 # Global simulation engine instance
@@ -27,18 +34,18 @@ async def lifespan(app: FastAPI):
     global simulation_engine
 
     # Startup
-    print(f"[{settings.APP_NAME} v{settings.APP_VERSION}] starting...")
+    logger.info(f"[{settings.APP_NAME} v{settings.APP_VERSION}] starting...")
     await init_db()
 
     # Start simulation engine
     simulation_engine = SimulationEngine()
     sim_task = asyncio.create_task(simulation_engine.run())
-    print(f"[Simulation Engine] running in background (tick every {settings.SIMULATION_TICK_SECONDS}s)")
+    logger.info(f"[Simulation Engine] running in background (tick every {settings.SIMULATION_TICK_SECONDS}s)")
 
     yield
 
     # Shutdown
-    print("Shutting down...")
+    logger.info("Shutting down...")
     if simulation_engine:
         simulation_engine.stop()
     sim_task.cancel()
@@ -55,6 +62,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
@@ -63,6 +73,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def add_security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["Content-Security-Policy"] = "default-src 'self'; connect-src 'self' *; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline';"
+    return response
 
 # Mount routers
 app.include_router(sim_router, prefix="/api/sim", tags=["Simulation"])

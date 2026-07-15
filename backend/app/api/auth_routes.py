@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from pydantic import BaseModel
 from app.core.database import get_db
 from app.core.security import get_password_hash, verify_password, create_access_token
+from app.core.rate_limit import limiter
 import sqlite3
 
 router = APIRouter()
@@ -25,7 +26,8 @@ class FanLogin(BaseModel):
     password: str
 
 @router.post("/staff/signup")
-async def staff_signup(data: StaffSignup):
+@limiter.limit("5/minute")
+async def staff_signup(request: Request, data: StaffSignup):
     db = await get_db()
     try:
         hashed_pw = get_password_hash(data.password)
@@ -45,7 +47,8 @@ async def staff_signup(data: StaffSignup):
         await db.close()
 
 @router.post("/staff/login")
-async def staff_login(data: StaffLogin):
+@limiter.limit("5/minute")
+async def staff_login(request: Request, data: StaffLogin):
     db = await get_db()
     try:
         async with db.execute("SELECT staff_id, name, role, password FROM staff WHERE staff_id = ?", (data.staff_id,)) as cursor:
@@ -60,7 +63,8 @@ async def staff_login(data: StaffLogin):
         await db.close()
 
 @router.post("/fan/signup")
-async def fan_signup(data: FanSignup):
+@limiter.limit("5/minute")
+async def fan_signup(request: Request, data: FanSignup):
     db = await get_db()
     try:
         hashed_pw = get_password_hash(data.password)
@@ -79,7 +83,8 @@ async def fan_signup(data: FanSignup):
         await db.close()
 
 @router.post("/fan/login")
-async def fan_login(data: FanLogin):
+@limiter.limit("5/minute")
+async def fan_login(request: Request, data: FanLogin):
     db = await get_db()
     try:
         async with db.execute("SELECT ticket_id, name, password FROM fans WHERE ticket_id = ?", (data.ticket_id,)) as cursor:

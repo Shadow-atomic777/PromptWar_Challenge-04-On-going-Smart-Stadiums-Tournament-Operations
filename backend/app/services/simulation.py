@@ -13,6 +13,9 @@ from app.models.parking import ParkingLot, ParkingSnapshot, ParkingStatus
 from app.models.medical import MedicalIncident, MedicalSnapshot, IncidentSeverity, IncidentType, IncidentStatus
 from app.models.weather import WeatherSnapshot, WeatherCondition, WeatherAlert, WeatherAlertLevel
 from app.models.stadium import Gate, MatchInfo, StadiumSnapshot, GateStatus, MatchPhase
+import logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 settings = get_settings()
 
@@ -533,7 +536,7 @@ class SimulationEngine:
     async def run(self):
         """Main simulation loop — ticks every N seconds and broadcasts state."""
         self.running = True
-        print("[Simulation] engine running...")
+        logger.info("[Simulation] engine running...")
 
         while self.running:
             try:
@@ -557,7 +560,7 @@ class SimulationEngine:
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                print(f"[Simulation error]: {e}")
+                logger.error(f"[Simulation error]: {e}")
                 await asyncio.sleep(settings.SIMULATION_TICK_SECONDS)
 
-        print("[Simulation] engine stopped.")
+        logger.info("[Simulation] engine stopped.")

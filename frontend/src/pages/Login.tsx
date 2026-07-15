@@ -48,9 +48,9 @@ export default function Login() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+    <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
       
-      <div className="glass-panel animate-fade-in" style={{ width: '100%', maxWidth: '420px', padding: '3rem 2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10 }}>
+      <section className="glass-panel animate-fade-in" style={{ width: '100%', maxWidth: '420px', padding: '3rem 2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 10 }}>
         
         <div style={{ marginBottom: '1.5rem' }}>
           <AnimatedFootball size={50} />
@@ -88,8 +88,8 @@ export default function Login() {
         </div>
 
         {error && (
-          <div style={{ width: '100%', padding: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.2)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
-            <ShieldAlert size={16} /> {error}
+          <div aria-live="assertive" style={{ width: '100%', padding: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.2)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
+            <ShieldAlert size={16} aria-hidden="true" /> {error}
           </div>
         )}
 
@@ -97,14 +97,15 @@ export default function Login() {
           
           {!isLogin && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <label style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: 500 }}>Full Name</label>
+              <label htmlFor="fullName" style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: 500 }}>Full Name</label>
               <div style={{ position: 'relative' }}>
-                <User size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                <User size={18} aria-hidden="true" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
                 <input 
+                  id="fullName"
                   type="text" 
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.75rem', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border)', borderRadius: '8px', color: 'white', outline: 'none', transition: 'border 0.2s' }}
+                  style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.75rem', background: 'rgba(128,128,128,0.1)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text-main)', outline: 'none', transition: 'border 0.2s' }}
                   placeholder="John Doe"
                 />
               </div>
@@ -112,30 +113,32 @@ export default function Login() {
           )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <label style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+            <label htmlFor="idValue" style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: 500 }}>
               {userType === 'staff' ? 'Staff ID' : 'Ticket ID'}
             </label>
             <div style={{ position: 'relative' }}>
-              <Hash size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+              <Hash size={18} aria-hidden="true" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
               <input 
+                id="idValue"
                 type="text" 
                 value={idValue}
                 onChange={e => setIdValue(e.target.value)}
-                style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.75rem', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border)', borderRadius: '8px', color: 'white', outline: 'none', transition: 'border 0.2s' }}
+                style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.75rem', background: 'rgba(128,128,128,0.1)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text-main)', outline: 'none', transition: 'border 0.2s' }}
                 placeholder={userType === 'staff' ? "e.g. OP-8342" : "e.g. TKT-9912"}
               />
             </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <label style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: 500 }}>Password</label>
+            <label htmlFor="password" style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: 500 }}>Password</label>
             <div style={{ position: 'relative' }}>
-              <Lock size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+              <Lock size={18} aria-hidden="true" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
               <input 
+                id="password"
                 type="password" 
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.75rem', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border)', borderRadius: '8px', color: 'white', outline: 'none', transition: 'border 0.2s' }}
+                style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.75rem', background: 'rgba(128,128,128,0.1)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text-main)', outline: 'none', transition: 'border 0.2s' }}
                 placeholder="••••••••"
               />
             </div>
@@ -153,15 +156,16 @@ export default function Login() {
 
         <div style={{ marginTop: '1.5rem', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
           {isLogin ? "Don't have an account? " : "Already have an account? "}
-          <span 
+          <button 
+            type="button"
             onClick={() => { setIsLogin(!isLogin); setError(''); }}
-            style={{ color: 'var(--primary)', cursor: 'pointer', fontWeight: 600 }}
+            style={{ color: 'var(--primary)', cursor: 'pointer', fontWeight: 600, background: 'none', border: 'none', padding: 0, fontSize: 'inherit' }}
           >
             {isLogin ? 'Sign up' : 'Log in'}
-          </span>
+          </button>
         </div>
 
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
